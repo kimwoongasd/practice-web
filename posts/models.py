@@ -1,9 +1,11 @@
 from django.db import models
+from django.core.validators import MinLengthValidator
+from .validators import validate_symbols
 
 # Create your models here.
 class Post(models.Model):
-    title = models.CharField(max_length=50)
-    content = models.TextField()
+    title = models.CharField(max_length=50, unique=True, error_messages={'unique' : "중복된 제목입니다."})
+    content = models.TextField(validators=[MinLengthValidator(10, "10자 이상 적어주세요"), validate_symbols])
     dt_create = models.DateTimeField(verbose_name="Date Create", auto_now_add=True)
     dt_modified = models.DateTimeField(verbose_name="Date Modified", auto_now=True)
     
