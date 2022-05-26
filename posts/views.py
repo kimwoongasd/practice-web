@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.core.paginator import Paginator
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 from django.urls import reverse
 from .models import Post
 from .forms import PostForm
@@ -11,17 +11,26 @@ from .forms import PostForm
 def index(request):
     return redirect('post-list')
 
-def post_list(request):
-    posts = Post.objects.all()
-    paginator = Paginator(posts, 3)
-    curr_page_number = request.GET.get('page')
-    if curr_page_number is None:
-        curr_page_number = 1
+# def post_list(request):
+#     posts = Post.objects.all()
+#     paginator = Paginator(posts, 3)
+#     curr_page_number = request.GET.get('page')
+#     if curr_page_number is None:
+#         curr_page_number = 1
         
-    page = paginator.page(curr_page_number)
-    return render(request, 'posts/post_list.html', {'page' : page})
+#     page = paginator.page(curr_page_number)
+#     return render(request, 'posts/post_list.html', {'page' : page})
 
-
+class PostListView(ListView):
+    model = Post
+    template_name = 'posts/post_list.html'
+    content_object = 'posts'
+    
+    # 최신순으로 글 정렬
+    ordering = ['-dt_create']
+    paginate_by = 6
+    page_kwarg = 'page'
+    
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     context = {"post" : post}
