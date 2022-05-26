@@ -18,15 +18,30 @@
     <div class='btn_post'>
         <a href="{% url 'post-create' %}">글쓰기</a>
     </div>
-    {% if posts %}
+    {% if page.object_list %}
         <div class="post_container">
-            {% for post in posts %}
+            {% for post in page.object_list %}
                 <div class="post"><a href="{% url 'post-detail' post.id %}">         
                     <h2 class="title">{{post.title}}</h2>
                     <p class="date">{{post.dt_create}}</p>
                     <p class="text">{{post.content|slice:"100"}}</p>
                 </a></div>
             {% endfor %}
+        </div>
+        <div class="paging">
+            {% if page.has_previous %}
+                <a href="?page=1" class="first">처음으로</a>
+                <a href="?page={{ page.previous_page_number }}" class="prev">전으로</a>
+            {% endif %}
+
+            <span>
+                <p>{{ page.number }} of {{ page.paginator.num_pages }}</p>
+            </sapn>
+
+            {% if page.has_next %}
+                <a href="?page={{ page.next_page_number }}" class="next">다음으로</a>
+                <a href="?page={{ page.paginator.num_pages }}" class="last">마지막으로</a>
+            {% endif %}
         </div>
     {% else %}
         <div class="blank">
