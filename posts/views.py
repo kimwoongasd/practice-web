@@ -1,7 +1,11 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.core.paginator import Paginator
+from django.views import View
+from django.views.generic import CreateView
+from django.urls import reverse
 from .models import Post
 from .forms import PostForm
+
 
 # Create your views here.
 def index(request):
@@ -23,18 +27,40 @@ def post_detail(request, post_id):
     context = {"post" : post}
     return render(request, 'posts/post_detail.html', context)
 
-def post_create(request):
-    if request.method == 'POST':
-        post_form = PostForm(request.POST)
-        # 데이터 유효 검사
-        if post_form.is_valid():
-            new_post = post_form.save()
-            return redirect('post-detail', post_id=new_post.id)
+# def post_create(request):
+#     if request.method == 'POST':
+#         post_form = PostForm(request.POST)
+#         # 데이터 유효 검사
+#         if post_form.is_valid():
+#             new_post = post_form.save()
+#             return redirect('post-detail', post_id=new_post.id)
         
-    else:
-        post_form = PostForm()
+#     else:
+#         post_form = PostForm()
         
-    return render(request, 'posts/post_form.html', {'form' : post_form})
+#     return render(request, 'posts/post_form.html', {'form' : post_form})
+
+# 클래스형 뷰
+# class PostCreateView(View):
+#     def get(self, request):
+#         post_form = PostForm()
+#         return render(request, 'posts/post_form.html', {'form' : post_form})
+    
+#     def post(self, request):
+#         post_form = PostForm(request.POST)
+#         # 데이터 유효 검사
+#         if post_form.is_valid():
+#             new_post = post_form.save()
+#             return redirect('post-detail', post_id=new_post.id)
+
+# 제네릭 뷰
+class PostCreateView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'posts/post_form.html'
+    
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'post_id' : self.object.id})
 
 def post_update(request, post_id):
     post = get_object_or_404(Post, id=post_id)
